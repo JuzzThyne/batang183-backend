@@ -1,9 +1,11 @@
 import express from "express";
 import { Admin } from "../models/adminModel.js";
+import bcrypt from "bcrypt";
+
 const router = express.Router();
 
 // add users
-router.post('/', async (request, response) => {
+router.post('/register', async (request, response) => {
     try {
         if (
             !request.body.name ||
@@ -24,10 +26,13 @@ router.post('/', async (request, response) => {
             });
         }
 
+        // Hash the password before storing it
+        const hashedPassword = await bcrypt.hash(request.body.password, 10);
+
         const newUser = {
             name: request.body.name,
             username: request.body.username,
-            password: request.body.password
+            password: hashedPassword
         };
 
         const user = await Admin.create(newUser);
@@ -38,6 +43,38 @@ router.post('/', async (request, response) => {
         response.status(500).send({ message: error.message });
     }
 });
+// Admin login
+router.post('/login', async (request, response) => {
+    try {
+        if (!request.body.username || !request.body.password) {
+            return response.status(400).send({
+                message: 'Send both username and password',
+            });
+        }
 
+        // Find the user by username
+        const user = await Admin.findOne({ username: request.body.username });
+
+        if (!user) {
+            return response.status(401).send({
+                message: 'Invalid username or password',
+            });
+        }
+
+        // Compare the provided password with the hashed password
+        const isPasswordValid = await bcrypt.compare(request.body.password, user.password);
+
+        if (isPasswordValid) {
+            response.send({ message: 'Login successful' });
+        } else {
+            response.status(401).send({
+                message: 'Invalid username or password',
+            });
+        }
+    } catch (error) {
+        console.log(error.message);
+        response.status(500).send({ message: error.message });
+    }
+});
 
 export default router;
