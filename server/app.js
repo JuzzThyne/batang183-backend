@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from 'cors';
 import dotenv from 'dotenv';
+import userRoutes from './routes/userRoutes.js'
 dotenv.config();
 
 const app = express();
@@ -15,7 +16,8 @@ app.get('/', (request, response) => {
     return response.status(234).send('Welcome')
 });
 
-
+// user model and routes
+app.use('/user', userRoutes)
 
 // connect database
 mongoose.connect(process.env.MONGODB_CONNECT_URI, {
