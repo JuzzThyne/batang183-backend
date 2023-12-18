@@ -1,22 +1,28 @@
 import express from "express";
+import jwt from "jsonwebtoken";
 import { User } from "../models/userModel.js";
+import authenticateToken from "../auth/authMiddleware.js";
+
 const router = express.Router();
 
-// get all users
-router.get('/', async (request, response)=>{
-    try{
+// Apply the middleware for routes that require authentication
+router.use(authenticateToken);
+
+// Example of a protected route
+router.get('/', async (request, response) => {
+    try {
         const users = await User.find({});
         return response.status(200).json({
             count: users.length,
             data: users
         });
-    }catch(error){
+    } catch (error) {
         console.log(error.message);
         response.status(500).send({ message: error.message });
     }
 });
 
-// add users
+// Your existing route for adding users
 router.post('/', async (request, response) => {
     try {
         if (
@@ -31,7 +37,6 @@ router.post('/', async (request, response) => {
             });
         }
 
-        // Check if user already exists with the provided contact number
         const existingUser = await User.findOne({ contact: request.body.contact });
 
         if (existingUser) {
@@ -49,13 +54,11 @@ router.post('/', async (request, response) => {
         };
 
         const user = await User.create(newUser);
-        // You might want to send a response after successfully creating the user
         response.status(201).send({ message: 'User created successfully' });
     } catch (error) {
         console.log(error.message);
         response.status(500).send({ message: error.message });
     }
 });
-
 
 export default router;

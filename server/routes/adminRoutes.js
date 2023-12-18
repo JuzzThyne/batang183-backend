@@ -1,8 +1,13 @@
 import express from "express";
 import { Admin } from "../models/adminModel.js";
 import bcrypt from "bcrypt";
+import dotenv from 'dotenv';
+import { generateToken } from "../auth/tokenUtils.js";
+import { verifyToken } from "../auth/tokenVerification.js";
+dotenv.config();
 
 const router = express.Router();
+
 
 // add users
 router.post('/register', async (request, response) => {
@@ -46,6 +51,7 @@ router.post('/register', async (request, response) => {
 // Admin login
 router.post('/login', async (request, response) => {
     try {
+
         if (!request.body.username || !request.body.password) {
             return response.status(400).send({
                 message: 'Send both username and password',
@@ -65,7 +71,8 @@ router.post('/login', async (request, response) => {
         const isPasswordValid = await bcrypt.compare(request.body.password, user.password);
 
         if (isPasswordValid) {
-            response.send({ message: 'Login successful' });
+            const token = generateToken(user);
+            response.send({ message: 'Login successful',token });
         } else {
             response.status(401).send({
                 message: 'Invalid username or password',
@@ -76,5 +83,28 @@ router.post('/login', async (request, response) => {
         response.status(500).send({ message: error.message });
     }
 });
+
+// logout routes
+router.post('/logout', (request, response) => {
+    // Retrieve the token from the Authorization header
+    const tokenHeader = request.headers.authorization;
+
+    if (!tokenHeader) {
+        // Token is missing
+        return response.status(401).send({ message: 'Missing Authorization header' });
+    }
+
+    // Extract the token from the Authorization header (assuming "Bearer" is used)
+    const token = tokenHeader.split(' ')[1];
+
+    if (token && verifyToken(token)) {
+        // Token is valid, remove it
+        response.send({ message: 'Logout successful', token: null });
+    } else {
+        // Token is either missing or invalid
+        response.status(401).send({ message: 'Invalid or missing token' });
+    }
+});
+
 
 export default router;
