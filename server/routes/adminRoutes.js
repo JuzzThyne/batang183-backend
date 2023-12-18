@@ -126,6 +126,7 @@ router.post('/logout', (request, response) => {
     // Extract the token from the Authorization header (assuming "Bearer" is used)
     const token = tokenHeader.split(' ')[1];
 
+    
     if (token && verifyToken(token)) {
         // Token is valid, remove it
         response.send({ message: 'Logout successful', token: null });
