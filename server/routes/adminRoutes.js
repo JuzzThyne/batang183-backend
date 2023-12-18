@@ -2,11 +2,40 @@ import express from "express";
 import { Admin } from "../models/adminModel.js";
 import bcrypt from "bcrypt";
 import dotenv from 'dotenv';
-import { generateToken } from "../auth/tokenUtils.js";
-import { verifyToken } from "../auth/tokenVerification.js";
+import jwt from 'jsonwebtoken';
 dotenv.config();
 
 const router = express.Router();
+
+
+// Function to generate a JWT token
+export const generateToken = (user) => {
+    const payload = {
+        userId: user._id,
+        username: user.username,
+        // You can add more information to the payload if needed
+    };
+    const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' }); // Adjust the expiration time as needed
+    return token;
+};
+
+// Function to verify if a token is valid
+export const verifyToken = (token) => {
+    try {
+        // Verify the token with the secret key and check for expiration
+        const decoded = jwt.verify(token, process.env.SECRET_KEY, { maxAge: '1h' });
+
+        // If the decoding is successful, the token is valid
+        return true;
+    } catch (error) {
+        // Check if the error is due to token expiration
+        if (error.name === 'TokenExpiredError') {
+            return false; // Token has expired
+        } else {
+            return false; // Other verification errors
+        }
+    }
+};
 
 
 // add users

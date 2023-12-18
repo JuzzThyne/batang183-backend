@@ -1,12 +1,10 @@
 import express from "express";
-import jwt from "jsonwebtoken";
 import { User } from "../models/userModel.js";
-import authenticateToken from "../auth/authMiddleware.js";
+
+import dotenv from 'dotenv';
+dotenv.config();
 
 const router = express.Router();
-
-// Apply the middleware for routes that require authentication
-router.use(authenticateToken);
 
 // Example of a protected route
 router.get('/', async (request, response) => {
