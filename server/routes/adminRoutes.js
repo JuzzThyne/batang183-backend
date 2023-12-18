@@ -1,42 +1,9 @@
 import express from "express";
 import { Admin } from "../models/adminModel.js";
 import bcrypt from "bcrypt";
-import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken';
-dotenv.config();
+
 
 const router = express.Router();
-
-
-// Function to generate a JWT token
-export const generateToken = (user) => {
-    const payload = {
-        userId: user._id,
-        username: user.username,
-        // You can add more information to the payload if needed
-    };
-    const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' }); // Adjust the expiration time as needed
-    return token;
-};
-
-// Function to verify if a token is valid
-export const verifyToken = (token) => {
-    try {
-        // Verify the token with the secret key and check for expiration
-        const decoded = jwt.verify(token, process.env.SECRET_KEY, { maxAge: '1h' });
-
-        // If the decoding is successful, the token is valid
-        return true;
-    } catch (error) {
-        // Check if the error is due to token expiration
-        if (error.name === 'TokenExpiredError') {
-            return false; // Token has expired
-        } else {
-            return false; // Other verification errors
-        }
-    }
-};
-
 
 // add users
 router.post('/register', async (request, response) => {
@@ -100,8 +67,7 @@ router.post('/login', async (request, response) => {
         const isPasswordValid = await bcrypt.compare(request.body.password, user.password);
 
         if (isPasswordValid) {
-            const token = generateToken(user);
-            response.send({ message: 'Login successful',token });
+            response.send({ message: 'Login successful'});
         } else {
             response.status(401).send({
                 message: 'Invalid username or password',
@@ -110,29 +76,6 @@ router.post('/login', async (request, response) => {
     } catch (error) {
         console.log(error.message);
         response.status(500).send({ message: error.message });
-    }
-});
-
-// logout routes
-router.post('/logout', (request, response) => {
-    // Retrieve the token from the Authorization header
-    const tokenHeader = request.headers.authorization;
-
-    if (!tokenHeader) {
-        // Token is missing
-        return response.status(401).send({ message: 'Missing Authorization header' });
-    }
-
-    // Extract the token from the Authorization header (assuming "Bearer" is used)
-    const token = tokenHeader.split(' ')[1];
-
-    
-    if (token && verifyToken(token)) {
-        // Token is valid, remove it
-        response.send({ message: 'Logout successful', token: null });
-    } else {
-        // Token is either missing or invalid
-        response.status(401).send({ message: 'Invalid or missing token' });
     }
 });
 

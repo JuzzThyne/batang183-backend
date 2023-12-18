@@ -1,9 +1,6 @@
 import express from "express";
 import { User } from "../models/userModel.js";
 
-import dotenv from 'dotenv';
-dotenv.config();
-
 const router = express.Router();
 
 // Example of a protected route
