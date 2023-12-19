@@ -13,9 +13,27 @@ const generateToken = (user) => {
         // You can add more information to the payload if needed
     };
 
-    const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' }); // Adjust the expiration time as needed
+    const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '24h' }); // Adjust the expiration time as needed
 
     return token;
+};
+
+// Function to verify if a token is valid
+const verifyToken = (token) => {
+    try {
+        // Verify the token with the secret key and check for expiration
+        const decoded = jwt.verify(token, process.env.SECRET_KEY, { maxAge: '24h' });
+        
+        // If the decoding is successful, the token is valid
+        return true;
+    } catch (error) {
+        // Check if the error is due to token expiration
+        if (error.name === 'TokenExpiredError') {
+            return false; // Token has expired
+        } else {
+            return false; // Other verification errors
+        }
+    }
 };
 
 // add users
@@ -79,7 +97,7 @@ router.post('/login', async (request, response) => {
         const isPasswordValid = await bcrypt.compare(request.body.password, user.password);
 
         if (isPasswordValid) {
-            const token = generateToken(user); // Capture the token
+            const token = generateToken(user);
             response.send({ message: 'Login successful', token });
         } else {
             response.status(401).send({
@@ -92,5 +110,17 @@ router.post('/login', async (request, response) => {
     }
 });
 
+// Logout route
+router.post('/logout', (request, response) => {
+    const { token } = request.body;
+
+    if (token && verifyToken(token)) {
+        // Token is valid, remove it
+        response.send({ message: 'Logout successful', token: null });
+    } else {
+        // Token is either missing or invalid
+        response.status(401).send({ message: 'Invalid or missing token' });
+    }
+});
 
 export default router;
