@@ -1,36 +1,24 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import { User } from "../models/userModel.js";
+import verifyToken from "../auth/authMiddleware.js";
+
 
 const router = express.Router();
 
-// Middleware function to verify the token
-const verifyToken = (request, response, next) => {
-    const token = request.header("Authorization");
-
-    if (!token) {
-        return response.status(401).json({ message: "Access denied. Token is missing." });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        request.user = decoded;
-        next();
-    } catch (error) {
-        return response.status(401).json({ message: "Invalid token." });
-    }
-};
-
-// Apply the token verification middleware to all routes below
-router.use(verifyToken);
-
 // Protected route
-router.get('/', async (request, response) => {
+router.get('/', verifyToken, async (request, response) => {
     try {
+        // Access the decoded user information from the request object
+        const user = request.user;
+
+        // Your route logic here (e.g., fetching data from the database)
         const users = await User.find({});
+
         return response.status(200).json({
             count: users.length,
-            data: users
+            data: users,
+            user // You can include the user information in the response if needed
         });
     } catch (error) {
         console.log(error.message);
@@ -39,7 +27,7 @@ router.get('/', async (request, response) => {
 });
 
 // Your existing route for adding users
-router.post('/', async (request, response) => {
+router.post('/', verifyToken, async (request, response) => {
     try {
         // ... (unchanged code)
 
