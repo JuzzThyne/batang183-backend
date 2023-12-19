@@ -1,9 +1,22 @@
 import express from "express";
 import { Admin } from "../models/adminModel.js";
 import bcrypt from "bcrypt";
-
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
+
+// Function to generate a JWT token
+const generateToken = (user) => {
+    const payload = {
+        userId: user._id,
+        username: user.username,
+        // You can add more information to the payload if needed
+    };
+
+    const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' }); // Adjust the expiration time as needed
+
+    return token;
+};
 
 // add users
 router.post('/register', async (request, response) => {
@@ -47,7 +60,6 @@ router.post('/register', async (request, response) => {
 // Admin login
 router.post('/login', async (request, response) => {
     try {
-
         if (!request.body.username || !request.body.password) {
             return response.status(400).send({
                 message: 'Send both username and password',
@@ -67,7 +79,8 @@ router.post('/login', async (request, response) => {
         const isPasswordValid = await bcrypt.compare(request.body.password, user.password);
 
         if (isPasswordValid) {
-            response.send({ message: 'Login successful'});
+            const token = generateToken(user); // Capture the token
+            response.send({ message: 'Login successful', token });
         } else {
             response.status(401).send({
                 message: 'Invalid username or password',
