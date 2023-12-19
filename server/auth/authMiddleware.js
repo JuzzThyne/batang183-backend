@@ -9,7 +9,6 @@ const verifyToken = (req, res, next) => {
   if (!authorizationHeader) {
     return res.status(401).json({ message: "Missing token" });
   }
-
   const token = authorizationHeader.split(" ")[1]; // Extract the token from the Authorization header
 
   try {

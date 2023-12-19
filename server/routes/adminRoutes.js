@@ -4,22 +4,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 import verifyToken from "../auth/authMiddleware.js";
+import generateToken from "../auth/authUtils.js";
 dotenv.config();
 
 const router = express.Router();
-
-// Function to generate a JWT token
-const generateToken = (user) => {
-    const payload = {
-        userId: user._id,
-        username: user.username,
-        // You can add more information to the payload if needed
-    };
-
-    const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' }); // Adjust the expiration time as needed
-
-    return token;
-};
 
 // add users
 router.post('/register', async (request, response) => {
@@ -68,16 +56,13 @@ router.post('/login', async (request, response) => {
                 message: 'Send both username and password',
             });
         }
-
         // Find the user by username
         const user = await Admin.findOne({ username: request.body.username });
-
         if (!user) {
             return response.status(401).send({
                 message: 'Invalid username or password',
             });
         }
-
         // Compare the provided password with the hashed password
         const isPasswordValid = await bcrypt.compare(request.body.password, user.password);
 
