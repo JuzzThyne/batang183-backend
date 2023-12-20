@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 const adminSchema = mongoose.Schema(
     {
         name: {
@@ -19,6 +18,5 @@ const adminSchema = mongoose.Schema(
         timestamps: true,
     }
 );
-
-
+adminSchema.index({ username: 1 }, { unique: true });
 export const Admin = mongoose.model('Admin', adminSchema);

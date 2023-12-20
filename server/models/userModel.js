@@ -22,6 +22,10 @@ const userSchema = mongoose.Schema(
             type: Number,
             required: true,
         },
+        precinct_number: {
+            type: String,
+            required: true,
+        },
     },
     {
         timestamps: true,

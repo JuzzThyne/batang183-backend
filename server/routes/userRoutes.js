@@ -1,5 +1,4 @@
 import express from "express";
-import jwt from "jsonwebtoken";
 import { User } from "../models/userModel.js";
 import verifyToken from "../auth/authMiddleware.js";
 
@@ -36,7 +35,8 @@ router.post('/', verifyToken, async (request, response) => {
             middle_name: request.body.middle_name,
             last_name: request.body.last_name,
             address: request.body.address,
-            contact: request.body.contact
+            contact: request.body.contact,
+            precinct_number: request.body.precinct_number
         };
 
         const user = await User.create(newUser);
