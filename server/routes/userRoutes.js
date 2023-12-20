@@ -1,9 +1,11 @@
 import express from "express";
 import { User } from "../models/userModel.js";
 import verifyToken from "../auth/authMiddleware.js";
+// import enforceHttps from "../auth/httpMiddleware.js";
 
 
 const router = express.Router();
+// router.use(enforceHttps);
 
 // Protected route
 router.get('/', verifyToken, async (request, response) => {

@@ -1,15 +1,18 @@
 import express from "express";
 import { Admin } from "../models/adminModel.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 import verifyToken from "../auth/authMiddleware.js";
 import generateToken from "../auth/authUtils.js";
+// import enforceHttps from "../auth/httpMiddleware.js";
 dotenv.config();
 
 const router = express.Router();
 
 // add users
+
+// router.use(enforceHttps);
+
 router.post('/register', async (request, response) => {
     try {
         if (
