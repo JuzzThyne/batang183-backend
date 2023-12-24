@@ -1,10 +1,11 @@
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken"; // Import the jwt module
 dotenv.config();
 
 // Middleware to verify JWT
 const verifyToken = (req, res, next) => {
     const authorizationHeader = req.headers.authorization;
-    
+
     if (!authorizationHeader) {
       return res.status(401).json({ message: "Missing token" });
     }
