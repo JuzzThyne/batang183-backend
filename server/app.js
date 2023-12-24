@@ -13,8 +13,8 @@ const app = express();
 app.use(express.json());
 // METHOD 1: Allow All Origins with Default of Cors(*)
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://batang183.vercel.app'], // Replace with your frontend's origin
-    credentials: true,
+    origin: 'http://localhost:5173', // Replace with your frontend's origin
+    credentials: true, 
   }));
 
 // Set up MongoDB session store
