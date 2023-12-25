@@ -40,15 +40,11 @@ router.use(session({
   resave: false,
   saveUninitialized: false,
   store: store, // Use the MongoDB session store
-  // cookie: { maxAge: 3600000, sameSite: null, secure: false, httpOnly: true, credentials: true  }, // 1 hour
-  cookie: { maxAge: 3600000, }, // it is for production
-  // cookie: { maxAge: 3600000, httpOnly: true,  }, // it is for localhost
-  // cookie: {
-  //   maxAge: 1000 * 60 * 60 * 24, // Set the cookie to expire after 24 hours
-  //   // httpOnly: true, // Ensures the cookie is only accessible through HTTP(S) requests
-  //   // secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS in production
-  //   // sameSite: 'strict', // Prevents the cookie from being sent with cross-site requests
-  // },
+  cookie: { 
+    maxAge: 3600000,
+    httpOnly: false,
+    secure: true, // Set to true if your frontend is served over HTTPS
+    sameSite: 'none', },
 }));
 
 router.post("/login", async (req, res) => {
