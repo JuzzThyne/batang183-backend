@@ -13,7 +13,6 @@ app.use(express.json());
 app.use(cors({
     origin: 'https://batang183.vercel.app', // Replace with your frontend's origin
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],
   }));
 
   app.use((req, res, next) => {
