@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 
-// app.use(allowCors);
+app.use(allowCors);
 // middleware for parsing request body
 app.use(express.json());
 // METHOD 1: Allow All Origins with Default of Cors(*)
