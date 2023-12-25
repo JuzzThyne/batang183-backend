@@ -47,6 +47,10 @@ router.use(session({
   store: store, // Use the MongoDB session store
   cookie: { 
     maxAge: 3600000,
+    sameSite: 'none',
+    secure: 'auto',
+    httpOnly: true,
+
   },
 }));
 
