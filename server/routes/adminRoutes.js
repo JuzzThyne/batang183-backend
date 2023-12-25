@@ -42,7 +42,7 @@ router.use(session({
   store: store, // Use the MongoDB session store
   cookie: {
     maxAge: 1000 * 60 * 60 * 24, // Set the cookie to expire after 24 hours
-    httpOnly: true, // Ensures the cookie is only accessible through HTTP(S) requests
+    // httpOnly: true, // Ensures the cookie is only accessible through HTTP(S) requests
     // secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS in production
     // sameSite: 'strict', // Prevents the cookie from being sent with cross-site requests
   },
