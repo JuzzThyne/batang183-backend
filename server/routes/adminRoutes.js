@@ -12,6 +12,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 
+
+
+const router = express.Router();
 // Set up MongoDB session store
 const MongoDBStore = ConnectMongoDBSession(session);
 const store = new MongoDBStore({
@@ -26,8 +29,6 @@ const store = new MongoDBStore({
 store.on('error', (error) => {
   console.error(error);
 });
-
-const router = express.Router();
 
 router.use(session({
   genid: (req) => {
