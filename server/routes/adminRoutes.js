@@ -50,7 +50,7 @@ router.use(session({
     sameSite: 'none',
     secure: 'auto',
     httpOnly: true,
-
+    domain: 'http://localhost:5173',
   },
 }));
 
