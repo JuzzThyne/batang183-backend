@@ -2,6 +2,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Admin } from "../models/adminModel.js";
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const loginController = async (req, res) => {
     try {
@@ -28,7 +30,6 @@ export const loginController = async (req, res) => {
             const token = jwt.sign({ adminId: admin._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
             req.session.auth = true;
             req.session.adminId = admin._id; // Optionally, store additional data in the session
-
             return res.json({ success: true, message: "Login successful", token });
         } else {
             // If passwords do not match, return an error
