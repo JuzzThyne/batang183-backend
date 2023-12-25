@@ -43,6 +43,7 @@ router.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", true);
   next();
 });
+
 router.use(session({
   genid: (req) => {
     return uuidv4(); // Generate a new UUID for each session
