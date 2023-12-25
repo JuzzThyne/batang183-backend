@@ -12,6 +12,7 @@ import dotenv from 'dotenv';
 import jwt from "jsonwebtoken";
 import { Admin } from "../models/adminModel.js";
 import bcrypt from "bcrypt";
+import cors from 'cors';
 
 
 dotenv.config();
@@ -32,6 +33,11 @@ store.on('error', (error) => {
 });
 
 const router = express.Router();
+
+router.use(cors({
+  origin: 'http://localhost:5173', // Replace with your frontend's origin
+  credentials: true,
+}));
 
 router.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", true);
