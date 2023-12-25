@@ -41,7 +41,7 @@ router.use(session({
   saveUninitialized: false,
   store: store, // Use the MongoDB session store
   // cookie: { maxAge: 3600000, sameSite: null, secure: false, httpOnly: true, credentials: true  }, // 1 hour
-  cookie: { maxAge: 3600000, httpOnly: true, domain: 'https://batang183.vercel.app'  }, // it is for production
+  cookie: { maxAge: 3600000, secure: true, credentials: true, httpOnly: true, domain: 'https://batang183.vercel.app'  }, // it is for production
   // cookie: { maxAge: 3600000, httpOnly: true,  }, // it is for localhost
   // cookie: {
   //   maxAge: 1000 * 60 * 60 * 24, // Set the cookie to expire after 24 hours
