@@ -12,7 +12,6 @@ import dotenv from 'dotenv';
 import jwt from "jsonwebtoken";
 import { Admin } from "../models/adminModel.js";
 import bcrypt from "bcrypt";
-import cookieParser from "cookie-parser";
 
 
 dotenv.config();
@@ -34,7 +33,10 @@ store.on('error', (error) => {
 
 const router = express.Router();
 
-router.use(cookieParser());
+router.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", true);
+  next();
+});
 router.use(session({
   genid: (req) => {
     return uuidv4(); // Generate a new UUID for each session
