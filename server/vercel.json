@@ -1,16 +1,26 @@
 {
     "version": 2,
     "builds": [
-     {
-      "src": "app.js",
-      "use": "@vercel/node",
-      "config": { "includeFiles": ["dist/**"] }
-     }
+      {
+        "src": "app.js",
+        "use": "@vercel/node",
+        "config": { "includeFiles": ["dist/**"] }
+      }
     ],
     "routes": [
-     {
-      "src": "/(.*)",
-      "dest": "app.js"
-     }
+      {
+        "src": "/api/(.*)",
+        "dest": "app.js"
+      }
+    ],
+    "headers": [
+      { 
+        "source": "/api/(.*)", 
+        "headers": [
+          { "key": "Access-Control-Allow-Origin", "value": "*" },
+          { "key": "Access-Control-Allow-Credentials", "value": "true" }
+        ] 
+      }
     ]
-   }
+  }
+  
