@@ -12,6 +12,7 @@ import dotenv from 'dotenv';
 import jwt from "jsonwebtoken";
 import { Admin } from "../models/adminModel.js";
 import bcrypt from "bcrypt";
+import allowCors from "../Auth/allowCors.js";
 
 dotenv.config();
 
@@ -31,6 +32,8 @@ store.on('error', (error) => {
 });
 
 const router = express.Router();
+router.use(allowCors);
+
 
 router.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", true);
