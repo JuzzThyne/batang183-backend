@@ -12,6 +12,8 @@ import dotenv from 'dotenv';
 import jwt from "jsonwebtoken";
 import { Admin } from "../models/adminModel.js";
 import bcrypt from "bcrypt";
+import cookieParser from "cookie-parser";
+
 
 dotenv.config();
 
@@ -32,6 +34,7 @@ store.on('error', (error) => {
 
 const router = express.Router();
 
+router.use(cookieParser());
 router.use(session({
   genid: (req) => {
     return uuidv4(); // Generate a new UUID for each session
@@ -42,9 +45,10 @@ router.use(session({
   store: store, // Use the MongoDB session store
   cookie: { 
     maxAge: 3600000,
-    httpOnly: false,
-    secure: true, // Set to true if your frontend is served over HTTPS
-    sameSite: 'none', },
+    // httpOnly: false,
+    // secure: true, // Set to true if your frontend is served over HTTPS
+    // sameSite: 'none', 
+  },
 }));
 
 router.post("/login", async (req, res) => {
