@@ -55,7 +55,7 @@ router.use(session({
   cookie: { 
     maxAge: 3600000,
     httpOnly: true,
-    // secure: false, // Set to true if your frontend is served over HTTPS
+    secure: false, // Set to true if your frontend is served over HTTPS
     sameSite: 'none', 
   },
 }));
