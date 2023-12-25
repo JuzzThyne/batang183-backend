@@ -1,6 +1,5 @@
 import express from "express";
 import mongoose from "mongoose";
-import cors from 'cors';
 import dotenv from 'dotenv';
 import adminRoutes from './routes/adminRoutes.js';
 
@@ -10,10 +9,6 @@ const app = express();
 // middleware for parsing request body
 app.use(express.json());
 // METHOD 1: Allow All Origins with Default of Cors(*)
-app.use(cors({
-    origin: 'http://localhost:5173', // Replace with your frontend's origin
-    credentials: true,
-  }));
 
 app.get('/', (request, response) => {
     console.log(request)
@@ -22,7 +17,6 @@ app.get('/', (request, response) => {
 
 // admin model and routes
 app.use('/admin', adminRoutes)
-
 
 // connect database
 mongoose.connect(process.env.MONGODB_CONNECT_URI_ADMIN, {
