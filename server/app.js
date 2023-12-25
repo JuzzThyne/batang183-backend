@@ -16,8 +16,10 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],
   }));
 
-
-
+  app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Credentials", true);
+    next();
+  });
 
 app.get('/', (request, response) => {
     console.log(request)
