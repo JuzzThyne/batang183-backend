@@ -38,7 +38,7 @@ router.use(session({
   },
   secret: 'keyboard cat',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   store: store, // Use the MongoDB session store
   cookie: {
     maxAge: 1000 * 60 * 60 * 24, // Set the cookie to expire after 24 hours
