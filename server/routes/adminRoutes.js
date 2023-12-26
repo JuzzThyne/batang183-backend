@@ -57,7 +57,7 @@ router.use(session({
     sameSite: 'none',
     secure: 'auto',
     httpOnly: true,
-    domain: 'https://batang183-backend.vercel.app',
+    // domain: 'http://localhost:5173',
   },
 }));
 
