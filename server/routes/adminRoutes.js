@@ -54,7 +54,7 @@ router.use(session({
   store: store, // Use the MongoDB session store
   cookie: { 
     maxAge: 3600000,
-    // sameSite: 'none',
+    sameSite: 'Strict',
     secure: 'auto',
     httpOnly: true,
     // domain: 'http://localhost:5173',
