@@ -3,14 +3,9 @@ import mongoose from "mongoose";
 import cors from 'cors';
 import dotenv from 'dotenv';
 import adminRoutes from './routes/adminRoutes.js';
-import allowCors from "./Auth/allowCors.js";
 
 dotenv.config();
-
 const app = express();
-
-// app.use(allowCors);
-// middleware for parsing request body
 app.use(express.json());
 // METHOD 1: Allow All Origins with Default of Cors(*)
 app.use(cors({

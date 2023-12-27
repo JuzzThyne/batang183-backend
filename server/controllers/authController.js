@@ -13,7 +13,7 @@ export const loginController = async (req, res) => {
         if (!username || !password) {
             return res.status(400).json({ message: "Username and password are required" });
         }
-
+        
         // Find the admin by username
         const admin = await Admin.findOne({ username }).select('password');
 
@@ -28,8 +28,6 @@ export const loginController = async (req, res) => {
         // If passwords match, create a session and return a success message
         if (passwordMatch) {
             const token = jwt.sign({ adminId: admin._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
-            req.session.auth = true;
-            req.session.adminId = admin._id; // Optionally, store additional data in the session
             return res.json({ success: true, message: "Login successful", token });
         } else {
             // If passwords do not match, return an error
@@ -43,15 +41,7 @@ export const loginController = async (req, res) => {
 
 export const logoutController = (req, res) => {
     // Destroy the session
-    req.session.destroy((err) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: "Error logging out" });
-        }
-        // Clear the session cookie
-        res.clearCookie("connect.sid");
-        res.json({ success: true, message: "Logout successful" });
-    });
+    res.json({ success: true, message: "Logout successful" });
 };
 
 export const registerController = async (req, res) => {
