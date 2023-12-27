@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Admin } from "../models/adminModel.js";
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 export const loginController = async (req, res) => {
@@ -13,7 +14,7 @@ export const loginController = async (req, res) => {
         if (!username || !password) {
             return res.status(400).json({ message: "Username and password are required" });
         }
-        
+
         // Find the admin by username
         const admin = await Admin.findOne({ username }).select('password');
 
@@ -21,12 +22,13 @@ export const loginController = async (req, res) => {
         if (!admin) {
             return res.status(401).json({ message: "Invalid username or password" });
         }
-
+        
         // Compare the provided password with the hashed password in the database
         const passwordMatch = await bcrypt.compare(password, admin.password);
 
         // If passwords match, create a session and return a success message
         if (passwordMatch) {
+            // Create a new session with random id
             const token = jwt.sign({ adminId: admin._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
             return res.json({ success: true, message: "Login successful", token });
         } else {
