@@ -10,7 +10,7 @@ router.use(express.json());
 
 router.post("/login", loginController);
 
-router.post("/logout", verifyToken, logoutController);
+router.post("/logout", logoutController);
 
 router.post("/register", registerController);
 
