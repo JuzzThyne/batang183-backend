@@ -43,7 +43,6 @@ export const loginController = async (req, res) => {
 
 export const logoutController = (req, res) => {
     // Destroy the session
-    sessionStorage.removeItem('SecretToken');
     res.json({ success: true, message: "Logout successful" });
 };
 
