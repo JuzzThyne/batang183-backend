@@ -1,6 +1,6 @@
 // authRoutes.js
 import express from 'express';
-import { loginController, logoutController, registerController } from '../controllers/authController.js';
+import { loginController, logoutController, registerController, getUserController } from '../controllers/authController.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
@@ -40,13 +40,6 @@ router.post('/logout', verifyToken, logoutController);
 router.post('/register', registerController);
 
 // Protected route that requires a valid token
-router.get('/check-session', verifyToken, (req, res) => {
-  // Check the authentication using the token
-  if (req.user) {
-    res.json({ authenticated: true, adminId: req.user.adminId });
-  } else {
-    res.json({ authenticated: false, message: 'Not true' });
-  }
-});
+router.get('/check-session', verifyToken, getUserController);
 
 export default router;

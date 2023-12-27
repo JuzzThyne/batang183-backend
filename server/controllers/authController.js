@@ -74,3 +74,11 @@ export const registerController = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
+export const getUserController = async (req, res) => {
+    // Check the authentication using the token
+    if (req.user) {
+      res.json({ authenticated: true, adminId: req.user.adminId });
+    } else {
+      res.json({ authenticated: false, message: 'Not true' });
+    }
+};
