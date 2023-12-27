@@ -13,24 +13,24 @@ router.use(express.json());
 
 // Middleware for verifying the token
 const verifyToken = (req, res, next) => {
-  // Extract the token from the request headers
-  const token = req.headers.authorization;
+  const authorizationHeader = req.headers.authorization;
 
-  // Check if the token is present
-  if (!token) {
-    return res.status(401).json({ message: 'Unauthorized: No token provided' });
-  }
-
-  // Verify the token
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+    if (!authorizationHeader) {
+      return res.status(401).json({ message: "Missing token" });
     }
-
-    // Attach the decoded user information to the request object
-    req.user = decoded;
-    next();
-  });
+    const token = authorizationHeader.split(" ")[1]; // Extract the token from the Authorization header
+  
+    try {
+      const decoded = jwt.verify(token, process.env.SECRET_KEY);
+      req.user = decoded; // Attach the decoded user information to the request object
+      next();
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        return res.status(401).json({ message: "Token has expired" });
+      } else {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+    }
 };
 
 // Routes
