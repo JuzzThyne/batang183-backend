@@ -10,7 +10,6 @@ app.use(express.json());
 // METHOD 1: Allow All Origins with Default of Cors(*)
 app.use(cors({
     origin: 'https://batang183.vercel.app', // Replace with your frontend's origin
-    credentials: true,
   }));
 
 app.get('/', (request, response) => {
