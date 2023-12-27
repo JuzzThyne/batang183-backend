@@ -52,6 +52,13 @@ router.use(session({
   resave: false,
   saveUninitialized: false,
   store: store, // Use the MongoDB session store
+  cookie: { 
+    maxAge: 3600000,
+    sameSite: 'Strict',
+    secure: 'true',
+    httpOnly: true,
+    domain: 'http://localhost:5173',
+  },
 }));
 
 router.post("/login", async (req, res) => {
@@ -101,6 +108,9 @@ router.post("/logout",verifyToken, async (req, res) => {
         console.error(err);
         return res.status(500).json({ message: "Failed to logout" });
       }
+
+      // Clear the session cookies
+      res.clearCookie("connect.sid");
 
       return res.json({ success: true, message: "Logout successful" });
     });
