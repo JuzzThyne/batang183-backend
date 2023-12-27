@@ -22,7 +22,7 @@ export const loginController = async (req, res) => {
         if (!admin) {
             return res.status(401).json({ message: "Invalid username or password" });
         }
-        
+
         // Compare the provided password with the hashed password in the database
         const passwordMatch = await bcrypt.compare(password, admin.password);
 
@@ -43,6 +43,7 @@ export const loginController = async (req, res) => {
 
 export const logoutController = (req, res) => {
     // Destroy the session
+    sessionStorage.removeItem('SecretToken');
     res.json({ success: true, message: "Logout successful" });
 };
 
