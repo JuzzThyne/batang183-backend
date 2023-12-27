@@ -1,5 +1,4 @@
 // authRoutes.js
-
 import express from 'express';
 import { loginController, logoutController, registerController } from '../controllers/authController.js';
 import jwt from 'jsonwebtoken';
