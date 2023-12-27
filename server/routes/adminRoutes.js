@@ -52,13 +52,6 @@ router.use(session({
   resave: false,
   saveUninitialized: false,
   store: store, // Use the MongoDB session store
-  cookie: { 
-    maxAge: 3600000,
-    sameSite: 'Strict',
-    secure: 'true',
-    httpOnly: true,
-    domain: 'http://localhost:5173',
-  },
 }));
 
 router.post("/login", async (req, res) => {
@@ -86,6 +79,9 @@ router.post("/login", async (req, res) => {
           const token = jwt.sign({ adminId: admin._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
           req.session.auth = true;
           req.session.adminId = admin._id; // Optionally, store additional data in the session
+          // Clear session cookies
+          req.session.cookie.expires = false;
+          req.session.cookie.maxAge = 0;
           return res.json({ success: true, message: "Login successful", token });
       } else {
           // If passwords do not match, return an error
@@ -97,7 +93,22 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/logout",verifyToken, logoutController);
+router.post("/logout",verifyToken, async (req, res) => {
+  try {
+    // Use req.session.destroy to destroy the session
+    req.session.destroy((err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Failed to logout" });
+      }
+
+      return res.json({ success: true, message: "Logout successful" });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 router.post("/register", registerController);
 router.get("/check-session", verifyToken, (req, res) => {
   // Session is still valid, continue with checking authentication
