@@ -3,7 +3,6 @@ import express from 'express';
 import { loginController, logoutController, registerController, getUserController } from '../controllers/authController.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
 const router = express.Router();

@@ -28,8 +28,10 @@ export const loginController = async (req, res) => {
 
         // If passwords match, create a session and return a success message
         if (passwordMatch) {
+
             // Create a new session with random id
-            const token = jwt.sign({ adminId: admin._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+            const token = jwt.sign({ adminId: admin._id }, process.env.SECRET_KEY, { expiresIn: '24h' });
+            
             return res.json({ success: true, message: "Login successful", token });
         } else {
             // If passwords do not match, return an error
@@ -48,10 +50,10 @@ export const logoutController = (req, res) => {
 
 export const registerController = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { name, username, password } = req.body;
 
         // Check if username and password are provided
-        if (!username || !password) {
+        if (!name || !username || !password) {
             return res.status(400).json({ message: "Username and password are required" });
         }
 
@@ -65,7 +67,7 @@ export const registerController = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create a new admin with the hashed password
-        const newAdmin = new Admin({ username, password: hashedPassword });
+        const newAdmin = new Admin({ name, username, password: hashedPassword });
         await newAdmin.save();
 
         res.json({ success: true, message: "Registration successful" });

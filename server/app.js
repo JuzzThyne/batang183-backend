@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from 'cors';
 import dotenv from 'dotenv';
 import adminRoutes from './routes/adminRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -19,6 +20,7 @@ app.get('/', (request, response) => {
 
 // admin model and routes
 app.use('/admin', adminRoutes)
+app.use('/user', userRoutes)
 
 // connect database
 mongoose.connect(process.env.MONGODB_CONNECT_URI_ADMIN, {
