@@ -34,19 +34,35 @@ const verifyToken = (req, res, next) => {
 // Your existing route for fetching users
 router.post('/', verifyToken, async (req, res) => {
     try {
-        // Your route logic here (e.g., fetching data from the database)
-        const users = await User.find({});
+        // Extracting the search term from the query parameters
+        const searchTerm = req.body.searchTerm;
+
+        // Constructing a dynamic query based on the search term
+        const query = searchTerm
+            ? {
+                $or: [
+                    { first_name: { $regex: new RegExp(searchTerm, 'i') } },
+                    { middle_name: { $regex: new RegExp(searchTerm, 'i') } },
+                    { last_name: { $regex: new RegExp(searchTerm, 'i') } },
+                    { address: { $regex: new RegExp(searchTerm, 'i') } },
+                    { precinct_number: { $regex: new RegExp(searchTerm, 'i') } },
+                ],
+            }
+            : {};
+
+        // Fetching data from the database using the dynamic query
+        const users = await User.find(query);
 
         return res.status(200).json({
             count: users.length,
             data: users,
-            user: req.user // Use the user information attached to the request object
         });
     } catch (error) {
         console.log(error.message);
         res.status(500).send({ message: error.message });
     }
 });
+
 
 // Your existing route for adding users
 router.post('/add', verifyToken, async (req, res) => {
@@ -64,6 +80,48 @@ router.post('/add', verifyToken, async (req, res) => {
 
         const createdUser = await User.create(newUser);
         res.status(201).send({ message: 'User created successfully', user: createdUser });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({ message: error.message });
+    }
+});
+// Route for fetching a single user
+router.get('/:userId', verifyToken, async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const user = await User.findById(userId, 'first_name middle_name Last_name  address precinct_number');
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({ user });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({ message: error.message });
+    }
+});
+
+// Route for updating a single user
+router.put('/:userId', verifyToken, async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const updatedUser = {
+            first_name: req.body.first_name,
+            middle_name: req.body.middle_name,
+            last_name: req.body.last_name,
+            address: req.body.address,
+            contact: req.body.contact,
+            precinct_number: req.body.precinct_number
+        };
+
+        const user = await User.findByIdAndUpdate(userId, updatedUser, { new: true });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({ message: 'User updated successfully', user });
     } catch (error) {
         console.log(error.message);
         res.status(500).send({ message: error.message });
