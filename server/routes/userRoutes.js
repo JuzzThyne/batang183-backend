@@ -34,52 +34,63 @@ const verifyToken = (req, res, next) => {
 // Your existing route for fetching users
 router.post('/', verifyToken, async (req, res) => {
     try {
-        // Extracting the search term from the query parameters
-        const searchTerm = req.body.searchTerm;
-
-        // Constructing a dynamic query based on the search term
+        const { searchTerm, page = 1, limit = 10 } = req.body;
+    
         const query = searchTerm
-            ? {
-                $or: [
-                    { first_name: { $regex: new RegExp(searchTerm, 'i') } },
-                    { middle_name: { $regex: new RegExp(searchTerm, 'i') } },
-                    { last_name: { $regex: new RegExp(searchTerm, 'i') } },
-                    { address: { $regex: new RegExp(searchTerm, 'i') } },
-                    { precinct_number: { $regex: new RegExp(searchTerm, 'i') } },
-                ],
+          ? {
+              $or: [
+                { first_name: { $regex: new RegExp(searchTerm, 'i') } },
+                { middle_name: { $regex: new RegExp(searchTerm, 'i') } },
+                { last_name: { $regex: new RegExp(searchTerm, 'i') } },
+                { address: { $regex: new RegExp(searchTerm, 'i') } },
+                { precinct_number: { $regex: new RegExp(searchTerm, 'i') } },
+              ],
             }
-            : {};
-
-        // Fetching data from the database using the dynamic query
-        const users = await User.find(query);
-
+          : {};
+    
+        // Perform a count query to get the total number of users
+        const totalUsersCount = await User.countDocuments(query);
+    
+        const skip = (page - 1) * limit;
+    
+        const users = await User.find(query)
+          .skip(skip)
+          .limit(limit);
+    
         return res.status(200).json({
-            count: users.length,
-            data: users,
+          count: users.length,
+          currentPage: page,
+          totalPages: Math.ceil(totalUsersCount / limit),
+          data: users,
         });
-    } catch (error) {
+      } catch (error) {
         console.log(error.message);
         res.status(500).send({ message: error.message });
-    }
+      }
 });
+
 
 
 // Your existing route for adding users
 router.post('/add', verifyToken, async (req, res) => {
     try {
-        // ... (unchanged code)
+        const users = req.body; // Assuming an array of users
 
-        const newUser = {
-            first_name: req.body.first_name,
-            middle_name: req.body.middle_name,
-            last_name: req.body.last_name,
-            address: req.body.address,
-            contact: req.body.contact,
-            precinct_number: req.body.precinct_number
-        };
+        // Loop through the array and create users
+        for (const user of users) {
+            const newUser = {
+                first_name: user.first_name,
+                middle_name: user.middle_name,
+                last_name: user.last_name,
+                gender: user.gender,
+                address: user.address,
+                contact: user.contact,
+                precinct_number: user.precinct_number
+            };
 
-        const createdUser = await User.create(newUser);
-        res.status(201).send({ message: 'User created successfully', user: createdUser });
+            await User.create(newUser);
+        }
+        res.status(201).send({ message: 'User created successfully'});
     } catch (error) {
         console.log(error.message);
         res.status(500).send({ message: error.message });

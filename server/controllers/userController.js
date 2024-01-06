@@ -34,6 +34,7 @@ router.post('/', verifyToken, async (request, response) => {
             first_name: request.body.first_name,
             middle_name: request.body.middle_name,
             last_name: request.body.last_name,
+            gender: request.body.gender,
             address: request.body.address,
             contact: request.body.contact,
             precinct_number: request.body.precinct_number
