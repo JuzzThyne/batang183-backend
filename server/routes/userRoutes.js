@@ -100,13 +100,31 @@ router.post('/add', verifyToken, async (req, res) => {
 router.get('/:userId', verifyToken, async (req, res) => {
     try {
         const userId = req.params.userId;
-        const user = await User.findById(userId, 'first_name middle_name Last_name  address precinct_number');
+        const user = await User.findById(userId);
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
+        const decodedUser = user._id;
 
-        return res.status(200).json({ user });
+        // Compare the userId with the decodedUser _id
+        if (userId !== decodedUser.toString()) {
+            return res.status(403).json({ message: "Unauthorized access" });
+        }
+
+        // Create a new object with limited data
+        const limitedUserData = {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            middle_name: user.middle_name,
+            gender: user.gender,
+            address: user.address,
+            contact: user.contact,
+            precinct_number: user.precinct_number
+             
+        };
+
+        return res.status(200).json({ data: limitedUserData });
     } catch (error) {
         console.log(error.message);
         res.status(500).send({ message: error.message });
