@@ -139,6 +139,7 @@ router.put('/:userId', verifyToken, async (req, res) => {
             first_name: req.body.first_name,
             middle_name: req.body.middle_name,
             last_name: req.body.last_name,
+            gender: req.body.gender,
             address: req.body.address,
             contact: req.body.contact,
             precinct_number: req.body.precinct_number
@@ -156,5 +157,24 @@ router.put('/:userId', verifyToken, async (req, res) => {
         res.status(500).send({ message: error.message });
     }
 });
+
+// Route for deleting a single user
+router.delete('/:userId', verifyToken, async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        const user = await User.findByIdAndDelete(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({ message: 'User deleted successfully' });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({ message: error.message });
+    }
+});
+
 
 export default router;
