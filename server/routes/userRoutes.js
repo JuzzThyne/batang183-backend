@@ -35,41 +35,45 @@ const verifyToken = (req, res, next) => {
 // Your existing route for fetching users
 router.post('/', verifyToken, async (req, res) => {
     try {
-        const { searchTerm, page = 1, limit = 10 } = req.body;
-    
-        const query = searchTerm
-          ? {
-              $or: [
-                { first_name: { $regex: new RegExp(searchTerm, 'i') } },
-                { middle_name: { $regex: new RegExp(searchTerm, 'i') } },
-                { last_name: { $regex: new RegExp(searchTerm, 'i') } },
-                { address: { $regex: new RegExp(searchTerm, 'i') } },
-                { precinct_number: { $regex: new RegExp(searchTerm, 'i') } },
-              ],
-            }
-          : {};
-    
-        // Perform a count query to get the total number of users
-        const totalUsersCount = await User.countDocuments(query);
-    
-        const skip = (page - 1) * limit;
-    
-        const users = await User.find(query)
-          .skip(skip)
-          .limit(limit);
-    
-        return res.status(200).json({
-          count: users.length,
-          currentPage: page,
-          totalPages: Math.ceil(totalUsersCount / limit),
-          data: users,
+      const { searchTerm, page = 1, limit = 10, sortOrder = 'asc' } = req.body;
+  
+      const query = searchTerm
+        ? {
+            $or: [
+              { first_name: { $regex: new RegExp(searchTerm, 'i') } },
+              { middle_name: { $regex: new RegExp(searchTerm, 'i') } },
+              { last_name: { $regex: new RegExp(searchTerm, 'i') } },
+              { address: { $regex: new RegExp(searchTerm, 'i') } },
+              { precinct_number: { $regex: new RegExp(searchTerm, 'i') } },
+            ],
+          }
+        : {};
+  
+      // Perform a count query to get the total number of users
+      const totalUsersCount = await User.countDocuments(query);
+  
+      const skip = (page - 1) * limit;
+  
+      const sortOption = sortOrder === 'asc' ? { last_name: 1 } : { last_name: -1 };
+  
+      const users = await User.find(query)
+        .skip(skip)
+        .limit(limit)
+        .sort(sortOption); // Sort by last_name
+  
+      return res.status(200).json({
+        count: users.length,
+        currentPage: page,
+        totalPages: Math.ceil(totalUsersCount / limit),
+        data: users,
         //   admin: req.user //this is for getting the admin ID
-        });
-      } catch (error) {
-        console.log(error.message);
-        res.status(500).send({ message: error.message });
-      }
-});
+      });
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).send({ message: error.message });
+    }
+  });
+  
 
 
 // Your existing route for adding multiple users
