@@ -2,10 +2,6 @@ import express from "express";
 import { User } from "../models/userModel.js";
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import NodeCache from "node-cache";
-import { addMultipleUserController, addSingleUserController, deleteSingleUserController, fetchUsersController, updateSingleUserController } from "../controllers/userController.js";
-
-const userCache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 
 dotenv.config();
 
@@ -37,23 +33,197 @@ const verifyToken = (req, res, next) => {
 };
 
 // Your existing route for fetching users
-router.post('/', verifyToken, fetchUsersController);
+router.post('/', verifyToken, async (req, res) => {
+    try {
+        const { searchTerm, page = 1, limit = 10 } = req.body;
+    
+        const query = searchTerm
+          ? {
+              $or: [
+                { first_name: { $regex: new RegExp(searchTerm, 'i') } },
+                { middle_name: { $regex: new RegExp(searchTerm, 'i') } },
+                { last_name: { $regex: new RegExp(searchTerm, 'i') } },
+                { address: { $regex: new RegExp(searchTerm, 'i') } },
+                { precinct_number: { $regex: new RegExp(searchTerm, 'i') } },
+              ],
+            }
+          : {};
+    
+        // Perform a count query to get the total number of users
+        const totalUsersCount = await User.countDocuments(query);
+    
+        const skip = (page - 1) * limit;
+    
+        const users = await User.find(query)
+          .skip(skip)
+          .limit(limit);
+    
+        return res.status(200).json({
+          count: users.length,
+          currentPage: page,
+          totalPages: Math.ceil(totalUsersCount / limit),
+          data: users,
+        //   admin: req.user //this is for getting the admin ID
+        });
+      } catch (error) {
+        console.log(error.message);
+        res.status(500).send({ message: error.message });
+      }
+});
 
 
 // Your existing route for adding multiple users
-router.post('/addmultiple', verifyToken, addMultipleUserController);
+router.post('/addmultiple', verifyToken, async (req, res) => {
+    try {
+        const users = req.body; // Assuming an array of users
 
-router.post('/add', verifyToken, addSingleUserController);
+        for (const user of users) {
+            const existingUser = await User.findOne({
+                first_name: user.first_name,
+                middle_name: user.middle_name,
+                last_name: user.last_name
+            });
+
+            if (existingUser) {
+                // User with the same name already exists, handle accordingly
+                res.status(400).send({ message: 'User already exists' });
+                return;
+            }
+
+            const newUser = {
+                first_name: user.first_name,
+                middle_name: user.middle_name,
+                last_name: user.last_name,
+                gender: user.gender,
+                address: user.address,
+                contact: user.contact,
+                precinct_number: user.precinct_number
+            };
+
+            await User.create(newUser);
+        }
+
+        res.status(201).send({ message: 'Users created successfully' });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({ message: error.message });
+    }
+});
+
+router.post('/add', verifyToken, async (req, res) => {
+    try {
+        const user = req.body; // Assuming a single user object
+
+        const existingUser = await User.findOne({
+            first_name: user.first_name,
+            middle_name: user.middle_name,
+            last_name: user.last_name
+        });
+
+        if (existingUser) {
+            // User with the same name already exists, handle accordingly
+            res.status(400).send({ message: 'User already exists' });
+            return;
+        }
+
+        const newUser = {
+            first_name: user.first_name,
+            middle_name: user.middle_name,
+            last_name: user.last_name,
+            gender: user.gender,
+            address: user.address,
+            contact: user.contact,
+            precinct_number: user.precinct_number
+        };
+        await User.create(newUser);
+
+        res.status(201).send({ message: 'User created successfully' });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({ message: error.message });
+    }
+});
 
 
 // Route for fetching a single user
-router.get('/:userId', verifyToken, fetchUsersController);
+router.get('/:userId', verifyToken, async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const decodedUser = user._id;
+
+        // Compare the userId with the decodedUser _id
+        if (userId !== decodedUser.toString()) {
+            return res.status(403).json({ message: "Unauthorized access" });
+        }
+
+        // Create a new object with limited data
+        const limitedUserData = {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            middle_name: user.middle_name,
+            gender: user.gender,
+            address: user.address,
+            contact: user.contact,
+            precinct_number: user.precinct_number
+             
+        };
+
+        return res.status(200).json({ data: limitedUserData });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({ message: error.message });
+    }
+});
 
 // Route for updating a single user
-router.put('/:userId', verifyToken, updateSingleUserController);
+router.put('/:userId', verifyToken, async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const updatedUser = {
+            first_name: req.body.first_name,
+            middle_name: req.body.middle_name,
+            last_name: req.body.last_name,
+            gender: req.body.gender,
+            address: req.body.address,
+            contact: req.body.contact,
+            precinct_number: req.body.precinct_number
+        };
+
+        const user = await User.findByIdAndUpdate(userId, updatedUser, { new: true });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({ message: 'User updated successfully'});
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({ message: error.message });
+    }
+});
 
 // Route for deleting a single user
-router.delete('/:userId', verifyToken, deleteSingleUserController);
+router.delete('/:userId', verifyToken, async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        const user = await User.findByIdAndDelete(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({ message: 'User deleted successfully' });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({ message: error.message });
+    }
+});
 
 
 export default router;
