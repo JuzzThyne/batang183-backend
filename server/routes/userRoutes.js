@@ -62,6 +62,7 @@ router.post('/', verifyToken, async (req, res) => {
           currentPage: page,
           totalPages: Math.ceil(totalUsersCount / limit),
           data: users,
+        //   admin: req.user //this is for getting the admin ID
         });
       } catch (error) {
         console.log(error.message);
@@ -70,14 +71,24 @@ router.post('/', verifyToken, async (req, res) => {
 });
 
 
-
-// Your existing route for adding users
-router.post('/add', verifyToken, async (req, res) => {
+// Your existing route for adding multiple users
+router.post('/addmultiple', verifyToken, async (req, res) => {
     try {
         const users = req.body; // Assuming an array of users
 
-        // Loop through the array and create users
         for (const user of users) {
+            const existingUser = await User.findOne({
+                first_name: user.first_name,
+                middle_name: user.middle_name,
+                last_name: user.last_name
+            });
+
+            if (existingUser) {
+                // User with the same name already exists, handle accordingly
+                res.status(400).send({ message: 'User already exists' });
+                return;
+            }
+
             const newUser = {
                 first_name: user.first_name,
                 middle_name: user.middle_name,
@@ -90,12 +101,49 @@ router.post('/add', verifyToken, async (req, res) => {
 
             await User.create(newUser);
         }
-        res.status(201).send({ message: 'User created successfully'});
+
+        res.status(201).send({ message: 'Users created successfully' });
     } catch (error) {
         console.log(error.message);
         res.status(500).send({ message: error.message });
     }
 });
+
+router.post('/add', verifyToken, async (req, res) => {
+    try {
+        const user = req.body; // Assuming a single user object
+
+        const existingUser = await User.findOne({
+            first_name: user.first_name,
+            middle_name: user.middle_name,
+            last_name: user.last_name
+        });
+
+        if (existingUser) {
+            // User with the same name already exists, handle accordingly
+            res.status(400).send({ message: 'User already exists' });
+            return;
+        }
+
+        const newUser = {
+            first_name: user.first_name,
+            middle_name: user.middle_name,
+            last_name: user.last_name,
+            gender: user.gender,
+            address: user.address,
+            contact: user.contact,
+            precinct_number: user.precinct_number
+        };
+        await User.create(newUser);
+
+        res.status(201).send({ message: 'User created successfully' });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({ message: error.message });
+    }
+});
+
+
 // Route for fetching a single user
 router.get('/:userId', verifyToken, async (req, res) => {
     try {
@@ -151,7 +199,7 @@ router.put('/:userId', verifyToken, async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        return res.status(200).json({ message: 'User updated successfully', user });
+        return res.status(200).json({ message: 'User updated successfully'});
     } catch (error) {
         console.log(error.message);
         res.status(500).send({ message: error.message });
