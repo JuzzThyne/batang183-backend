@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 // METHOD 1: Allow All Origins with Default of Cors(*)
 app.use(cors({
-    origin: 'https://batang183.vercel.app', // Replace with your frontend's origin
+    origin: `${process.env.PRODUCTION}`, // Replace with your frontend's origin
   }));
 
 app.get('/', (request, response) => {
