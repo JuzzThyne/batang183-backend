@@ -7,6 +7,21 @@ dotenv.config();
 
 const router = express.Router();
 
+router.use((req, res, next) => {
+  // Get user-agent from headers
+  const userAgent = req.headers['user-agent'];
+
+  // Extract operating system information from user-agent
+  const osMatch = userAgent.match(/\(([^)]+)\)/);
+
+  // Check if there is a match before accessing the result
+  const os = osMatch ? osMatch[1] : 'Unknown OS';
+
+  // Set the operating system information in the request object
+  req.os = os;
+
+  next();
+});
 router.use(express.json());
 
 // Middleware for verifying the token
@@ -39,6 +54,6 @@ router.post('/logout', verifyToken, logoutController);
 router.post('/register', registerController);
 
 // Protected route that requires a valid token
-router.get('/check-session', verifyToken, getUserController);
+router.get('/check-session/:token', verifyToken, getUserController);
 
 export default router;

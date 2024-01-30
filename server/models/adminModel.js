@@ -13,6 +13,10 @@ const adminSchema = mongoose.Schema(
             type: String,
             required: true,
         },
+        adminType: {
+            type: String,
+            required: true,
+        }
     },
     {
         timestamps: true,

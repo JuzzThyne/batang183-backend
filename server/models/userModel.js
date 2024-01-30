@@ -8,7 +8,7 @@ const userSchema = mongoose.Schema(
     {
         first_name: {
             type: String,
-            required: true,
+            required: [true, "First name is required"],
             validate: {
                 validator: (value) => /^[A-Za-z]+$/.test(value), // Only letters allowed
                 message: "First name should contain only letters.",
@@ -17,7 +17,7 @@ const userSchema = mongoose.Schema(
         },
         middle_name: {
             type: String,
-            required: true,
+            required: [true, "Middle name is required"],
             validate: {
                 validator: (value) => /^[A-Za-z]+$/.test(value), // Only letters allowed
                 message: "Middle name should contain only letters.",
@@ -26,7 +26,7 @@ const userSchema = mongoose.Schema(
         },
         last_name: {
             type: String,
-            required: true,
+            required: [true, "Last name is required"],
             validate: {
                 validator: (value) => /^[A-Za-z]+$/.test(value), // Only letters allowed
                 message: "Last name should contain only letters.",
@@ -35,19 +35,19 @@ const userSchema = mongoose.Schema(
         },
         gender: {
             type: String,
-            required: true,
+            required: [true, "Gender is required"],
         },
         address: {
             type: String,
-            required: true,
+            required: [true, "Address is required"],
         },
         contact: {
             type: Number,
-            required: true,
+            required: [true, "Contact number is required"],
         },
         precinct_number: {
             type: String,
-            required: true,
+            required: [true, "Precinct number is required"],
         },
     },
     {

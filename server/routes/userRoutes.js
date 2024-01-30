@@ -9,6 +9,18 @@ const router = express.Router();
 
 router.use(express.json());
 
+const validateInput = (req, res, next) => {
+
+    const user = req.body;
+
+    // Validate each input field as needed
+    if (!user.first_name || !user.last_name || !user.gender || !user.address || !user.contact || !user.precinct_number) {
+        return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    next(); // Proceed to the next middleware or route handler
+};
+
 // Middleware for token verification
 const verifyToken = (req, res, next) => {
     const authorizationHeader = req.headers.authorization;
@@ -114,7 +126,7 @@ router.post('/addmultiple', verifyToken, async (req, res) => {
     }
 });
 
-router.post('/add', verifyToken, async (req, res) => {
+router.post('/add', verifyToken, validateInput, async (req, res) => {
     try {
         const user = req.body; // Assuming a single user object
 
@@ -126,7 +138,7 @@ router.post('/add', verifyToken, async (req, res) => {
 
         if (existingUser) {
             // User with the same name already exists, handle accordingly
-            res.status(400).send({ message: 'User already exists' });
+            res.status(400).json({ error: 'User already exists' });
             return;
         }
 
@@ -141,10 +153,19 @@ router.post('/add', verifyToken, async (req, res) => {
         };
         await User.create(newUser);
 
-        res.status(201).send({ message: 'User created successfully' });
+        res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send({ message: error.message });
+        // Check for specific validation errors and send appropriate messages
+        if (error.errors) {
+            const validationErrors = {};
+            for (const key in error.errors) {
+                validationErrors[key] = error.errors[key].message;
+            }
+            res.status(400).json({ validationErrors });
+        } else {
+            console.error(error.message);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     }
 });
 
