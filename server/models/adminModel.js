@@ -19,7 +19,9 @@ const adminSchema = mongoose.Schema(
         }
     },
     {
-        timestamps: true,
+        timestamps: {
+            currentTime: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" })
+        },
     }
 );
 adminSchema.index({ username: 1 }, { unique: true });

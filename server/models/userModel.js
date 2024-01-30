@@ -1,3 +1,4 @@
+// userModel.js
 import mongoose from "mongoose";
 
 const capitalizeFirstLetter = (value) => {
@@ -33,6 +34,14 @@ const userSchema = mongoose.Schema(
             },
             set: capitalizeFirstLetter, // Capitalize the first letter
         },
+        birthdate: {
+            type: Date,
+            required: [true, "Birthdate is required"],
+        },
+        age: {
+            type: Number, // Store the age directly
+            required: true, // Age is now required in the model
+        },
         gender: {
             type: String,
             required: [true, "Gender is required"],
@@ -51,7 +60,9 @@ const userSchema = mongoose.Schema(
         },
     },
     {
-        timestamps: true,
+        timestamps: {
+            currentTime: () => new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" })
+        },
     }
 );
 
