@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import adminRoutes from './routes/adminRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import precinctNumber from './routes/precinctRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -21,6 +22,7 @@ app.get('/', (request, response) => {
 // admin model and routes
 app.use('/admin', adminRoutes)
 app.use('/user', userRoutes)
+app.use('/precinct', precinctNumber)
 
 // connect database
 mongoose.connect(process.env.MONGODB_CONNECT_URI_ADMIN, {

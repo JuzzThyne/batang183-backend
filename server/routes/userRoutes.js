@@ -96,7 +96,7 @@ router.get('/', verifyToken, async (req, res) => {
         const sortOption = sortOrder === 'asc' ? { last_name: 1 } : { last_name: -1 };
 
         const users = await User.find(query)
-            .select('_id first_name middle_name last_name gender address precinct_number') // Specify the fields you want
+            .select('_id first_name middle_name last_name gender address precinct_number age') // Specify the fields you want
             .skip(skip)
             .limit(limit)
             .sort(sortOption); // Sort by last_name
@@ -169,6 +169,17 @@ router.post('/add', verifyToken, validateInput, async (req, res) => {
             res.status(400).json({ error: 'User already exists' });
             return;
         }
+        let precinct_type; // Declare precinct_type outside the if block
+   
+        if(req.age >= 18){
+            precinct_type = "Both";
+            if (req.age >= 31) {
+                precinct_type = "Barangay Level";
+            }
+        }
+         else {
+            precinct_type = "SK Level";
+        }
         
         const newUser = {
             first_name: user.first_name,
@@ -179,7 +190,8 @@ router.post('/add', verifyToken, validateInput, async (req, res) => {
             address: user.address,
             contact: user.contact,
             precinct_number: user.precinct_number,
-            age: req.age // Access the age from the request object
+            age: req.age, // Access the age from the request object
+            precinct_type: precinct_type,
         };
 
         await User.create(newUser);
@@ -228,6 +240,7 @@ router.get('/:userId', verifyToken, async (req, res) => {
             address: user.address,
             contact: user.contact,
             precinct_number: user.precinct_number,
+            precinct_type: user.precinct_type,
             
              
         };

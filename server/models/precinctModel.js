@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
+
 const precinctSchema = mongoose.Schema(
     {
         category_type: {
             type: String,
-            required: true,
+            required: [true, "Empty or Invalid"],
+            enum: ["Barangay Level", "SK Level", "Both"]
         },
-        precint_number: {
+        precinct_number: {
             type: String,
             required: true,
         },

@@ -58,6 +58,11 @@ const userSchema = mongoose.Schema(
             type: String,
             required: [true, "Precinct number is required"],
         },
+        precinct_type: {
+            type: String,
+            enum: ["Barangay Level", "SK Level", "Both"],
+            required: true,
+        },
     },
     {
         timestamps: {
